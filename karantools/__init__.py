@@ -21,16 +21,15 @@ class AverageStreamer(object):
     def query(self):
         return self.total / self.count
 
-def print_comment_header_block(header_string, length=70):
-    print('#' * length)
-    left_spaces = (length - 2 - len(header_string)) // 2
-    right_spaces = length - 2 - len(header_string) - left_spaces
-    print('#' + ' ' * left_spaces + header_string + ' ' * right_spaces + '#')
-    print('#' * length)
-
 ######################################################################
 #                              ASSERTS                               #
 ######################################################################
+
+def assert_and_print(x, condition):
+    print(x)
+    if not condition:
+        print_bold("Assert condition does not hold.")
+        assert(condition)
 
 def assert_eq(a, b):
     if a != b:
@@ -80,6 +79,9 @@ class colors:
     def get(cls, color):
         return getattr(cls, color)
 
+######################################################################
+#                              PRINTING                              #
+######################################################################
 
 def print_bold(string):
     print(colors.BOLD + string + colors.END)
@@ -87,3 +89,10 @@ def print_bold(string):
 def print_color(string, color='RED'):
     color_string = colors.get(color.upper())
     print(color_string + string + colors.END)
+
+def print_comment_header_block(header_string, length=70):
+    print('#' * length)
+    left_spaces = (length - 2 - len(header_string)) // 2
+    right_spaces = length - 2 - len(header_string) - left_spaces
+    print('#' + ' ' * left_spaces + header_string + ' ' * right_spaces + '#')
+    print('#' * length)
