@@ -8,7 +8,7 @@ from setuptools import setup, find_packages
 
 setup(name='karantools',
       version='0.1',
-      description="Karan's useful python utilities.",
+      description="Karan's useful Python utilities.",
       keywords='tools utils utilities toolkit',
       url='http://github.com/karan1149/karantools',
       author='Karan Singhal',
