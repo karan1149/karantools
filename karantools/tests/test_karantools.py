@@ -29,6 +29,98 @@ def test_average_streamer():
 		streamer.add(i)
 		assert(streamer.query() == averages[i])
 
+def test_max_streamer():
+	streamer = kt.MaxStreamer()
+
+	with pytest.raises(RuntimeError):
+		streamer.query()
+
+	for i in range(0, 10):
+		streamer.add(i)
+		assert(streamer.query() == i)
+
+	for i in range(9, -1, -1):
+		streamer.add(i)
+		assert(streamer.query() == 9)
+
+def test_min_streamer():
+	streamer = kt.MinStreamer()
+
+	with pytest.raises(RuntimeError):
+		streamer.query()
+
+	for i in range(0, 10):
+		streamer.add(i)
+		assert(streamer.query() == 0)
+
+	for i in range(9, -1, -1):
+		streamer.add(i)
+		assert(streamer.query() == 0)
+
+	for i in range(-1, -10, -1):
+		streamer.add(i)
+		assert(streamer.query() == i)
+
+def test_max_score_streamer():
+	streamer = kt.MaxScoreStreamer(lambda x: x)
+
+	with pytest.raises(RuntimeError):
+		streamer.query()
+
+	with pytest.raises(RuntimeError):
+		streamer.query_score()
+
+	for i in range(0, 10):
+		streamer.add(i)
+		assert(streamer.query() == i)
+		assert(streamer.query_score() == i)
+
+	for i in range(9, -1, -1):
+		streamer.add(i)
+		assert(streamer.query() == 9)
+		assert(streamer.query_score() == 9)
+
+	streamer = kt.MaxScoreStreamer(lambda x: -x)
+
+	with pytest.raises(RuntimeError):
+		streamer.query()
+
+	with pytest.raises(RuntimeError):
+		streamer.query_score()
+
+	for i in range(0, 10):
+		streamer.add(i)
+		assert(streamer.query() == 0)
+		assert(streamer.query_score() == 0)
+
+	for i in range(9, -1, -1):
+		streamer.add(i)
+		assert(streamer.query() == 0)
+		assert(streamer.query_score() == 0)
+
+	for i in range(-1, -10, -1):
+		streamer.add(i)
+		assert(streamer.query() == i)
+		assert(streamer.query_score() == -i)
+
+	streamer = kt.MaxScoreStreamer(lambda x: -1 * abs(x - 5.5))
+
+	with pytest.raises(RuntimeError):
+		streamer.query()
+
+	with pytest.raises(RuntimeError):
+		streamer.query_score()
+
+	for i in range(0, 6):
+		streamer.add(i)
+		assert(streamer.query() == i)
+		assert(streamer.query_score() == i - 5.5)
+
+	for i in range(6, 10):
+		streamer.add(i)
+		assert(streamer.query() == 5)
+		assert(streamer.query_score() == -0.5)
+
 def test_assert_and_print():
 	kt.assert_and_print(1, 1 > 0)
 	kt.assert_and_print(1, 1 >= 0)

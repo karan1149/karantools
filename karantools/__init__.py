@@ -21,6 +21,63 @@ class AverageStreamer(object):
     def query(self):
         return self.total / self.count
 
+class MaxStreamer(object):
+    def __init__(self):
+        self.max = float('-inf')
+        self.added = False
+
+    def add(self, x):
+        if not self.added:
+            self.added = True
+        self.max = max(self.max, x)
+
+    def query(self):
+        if not self.added:
+            raise RuntimeError('No values added to streamer.')
+        return self.max
+
+class MinStreamer(object):
+    def __init__(self):
+        self.min = float('inf')
+        self.added = False
+
+    def add(self, x):
+        if not self.added:
+            self.added = True
+        self.min = min(self.min, x)
+
+    def query(self):
+        if not self.added:
+            raise RuntimeError('No values added to streamer.')
+        return self.min
+
+class MaxScoreStreamer(object):
+    def __init__(self, score_fn):
+        self.max = float('-inf')
+        self.max_x = None
+
+        self.added = False
+        self.score_fn = score_fn
+
+    def add(self, x):
+        if not self.added:
+            self.added = True
+        score = self.score_fn(x)
+
+        if score > self.max:
+            self.max = score
+            self.max_x = x
+
+    def query(self):
+        if not self.added:
+            raise RuntimeError('No values added to streamer.')
+        return self.max_x
+
+    def query_score(self):
+        if not self.added:
+            raise RuntimeError('No values added to streamer.')
+        return self.max
+
 ######################################################################
 #                              ASSERTS                               #
 ######################################################################
