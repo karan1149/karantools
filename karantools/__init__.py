@@ -1,4 +1,6 @@
 from collections import defaultdict
+import random
+import numpy as np
 
 def average(arr):
     return float(sum(arr)) / len(arr)
@@ -124,7 +126,11 @@ class colors:
     PURPLE = '\033[95m'
     CYAN = '\033[96m'
     DARKCYAN = '\033[36m'
+    LIGHTBLUE = '\033[38;5;38m'
     BLUE = '\033[94m'
+    MAGENTA = '\033[38;5;207m'
+    INDIGO = '\033[38;5;105m'
+    PINK = '\033[38;5;213m'
     GREEN = '\033[92m'
     YELLOW = '\033[93m'
     RED = '\033[91m'
@@ -132,9 +138,70 @@ class colors:
     UNDERLINE = '\033[4m'
     END = '\033[0m'
 
+    SEQUENCES_START_LOCS = {'BLUE': 20, 'RED': 160, 'GREEN': 76, 'INDIGO': 105, 'PINK': 213, 'LIGHTBLUE': 38, 'MAGENTA': 207, 'PURPLE': 93, 'CYAN': 33, 'DARKCYAN': 27, 'YELLOW': 226}
+
+    @classmethod
+    def normalize(cls, color):
+        return color.upper().replace('_', '').replace(' ', '').replace('-', '')
+
     @classmethod
     def get(cls, color):
         return getattr(cls, color)
+
+    @classmethod
+    def get_seq(cls, color, length):
+        def loc_to_coordinates(loc):
+            loc -= 16
+            red = loc // 36
+            loc = loc % 36 
+            green = loc // 6
+            loc = loc % 6
+            blue = loc
+            return [red, green, blue]
+
+        def coordinates_to_loc(coord):
+            return 16 + coord[0] * 36 + coord[1] * 6 + coord[2]
+
+        def perturb_coordinates(coord, perturb_hint=[None, None, None]):
+            while True:
+                original_coord = coord[:]
+                if perturb_hint[0] is None or perturb_hint[1] is None or perturb_hint[2] is None or random.random() < .05:
+                    perturb_direction = random.choice([0, 1, 2])
+                    perturb_sign = random.choice([-1, 1])
+                    perturb_hint = [0, 0, 0]
+                else:
+                    noised_directions = np.abs(np.array(perturb_hint) + 0.5 * np.random.randn(3))
+                    direction_probabilities =  noised_directions / noised_directions.sum()
+                    perturb_direction = np.random.choice([0, 1, 2], p=direction_probabilities)
+
+                    sign_probabilities = [(perturb_hint[perturb_direction] + 6) / 12.0, 1 - (perturb_hint[perturb_direction] + 6) / 12.0]
+                    perturb_sign = np.random.choice([-1, 1], p=sign_probabilities)
+                perturb_hint[perturb_direction] += perturb_sign
+                coord[perturb_direction] += perturb_sign
+                coord[perturb_direction] = max(0, coord[perturb_direction])
+                coord[perturb_direction] = min(5, coord[perturb_direction])
+
+                if original_coord != coord:
+                    return perturb_hint
+
+                
+        def get_color_at_loc(loc):
+            return '\033[38;5;%dm' % loc
+
+        start_loc = cls.SEQUENCES_START_LOCS[color]
+        coord = loc_to_coordinates(start_loc)
+
+        color_seq = []
+        perturb_hint = [None, None, None]
+
+        for i in range(length):
+            loc = coordinates_to_loc(coord)
+            color_seq.append(get_color_at_loc(loc))
+
+            perturb_hint = perturb_coordinates(coord, perturb_hint=perturb_hint)
+
+        return color_seq
+    
 
 ######################################################################
 #                              PRINTING                              #
@@ -144,8 +211,12 @@ def print_bold(string):
     print(colors.BOLD + string + colors.END)
 
 def print_color(string, color='RED'):
-    color_string = colors.get(color.upper())
+    color_string = colors.get(colors.normalize(color))
     print(color_string + string + colors.END)
+
+def print_color_gradient(string, color='RED'):
+    color_seq = colors.get_seq(colors.normalize(color), len(string))
+    print(''.join([color_seq[i] + ch + colors.END for i, ch in enumerate(string)]))
 
 def print_comment_header_block(header_string, length=70):
     print('#' * length)
