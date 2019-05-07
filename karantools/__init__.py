@@ -1,6 +1,10 @@
 from collections import defaultdict
 import random
 import numpy as np
+from contextlib import contextmanager
+import sys
+import os
+import pickle
 
 def average(arr):
     return float(sum(arr)) / len(arr)
@@ -201,7 +205,20 @@ class colors:
             perturb_hint = perturb_coordinates(coord, perturb_hint=perturb_hint)
 
         return color_seq
-    
+
+######################################################################
+#                           DOWNLOAD UTILS                           #
+######################################################################
+
+def lazy_load(construct_fn, filename):
+    try: 
+        with open(filename, 'rb') as f:
+            x = pickle.load(f)
+    except IOError:
+        x = construct_fn()
+        with open(filename, 'wb') as f:
+            pickle.dump(x, f)
+    return x
 
 ######################################################################
 #                              PRINTING                              #
@@ -224,3 +241,13 @@ def print_comment_header_block(header_string, length=70):
     right_spaces = length - 2 - len(header_string) - left_spaces
     print('#' + ' ' * left_spaces + header_string + ' ' * right_spaces + '#')
     print('#' * length)
+
+@contextmanager
+def suppress_stdout():
+    with open(os.devnull, "w") as devnull:
+        old_stdout = sys.stdout
+        sys.stdout = devnull
+        try:  
+            yield
+        finally:
+            sys.stdout = old_stdout
