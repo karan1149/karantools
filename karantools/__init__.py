@@ -5,6 +5,9 @@ from contextlib import contextmanager
 import sys
 import os
 import pickle
+import requests
+import zipfile
+import io
 
 def average(arr):
     return float(sum(arr)) / len(arr)
@@ -207,7 +210,7 @@ class colors:
         return color_seq
 
 ######################################################################
-#                           DOWNLOAD UTILS                           #
+#                            DOWNLOAD/IO                             #
 ######################################################################
 
 def lazy_load(construct_fn, filename):
@@ -219,6 +222,18 @@ def lazy_load(construct_fn, filename):
         with open(filename, 'wb') as f:
             pickle.dump(x, f)
     return x
+
+def download_and_extract_zip(url):
+    r = requests.get(url)
+    z = zipfile.ZipFile(io.BytesIO(r.content))
+    z.extractall()
+
+def read_lines(filename, map_fn):
+    mapped_lines = []
+    with open(filename, 'r') as f:
+        for line in f:
+            mapped_lines.append(map_fn(line))
+    return mapped_lines
 
 ######################################################################
 #                              PRINTING                              #

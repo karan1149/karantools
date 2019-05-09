@@ -170,3 +170,32 @@ def test_assert_float_neq():
 
 	with pytest.raises(AssertionError):
 		kt.assert_float_neq(1, 1 + 1e-10)
+
+def test_read_lines():
+	lines = kt.read_lines('test_file.txt', lambda x: x.strip().split())
+	lines_expected = [
+		['word1', 'word2'],
+		['word1', 'word3'],
+		['word', '1', 'word', '2'],
+		['words', 'next']
+	]
+	assert(lines == lines_expected)
+
+	def map_line(line):
+		line = line.strip().split()
+		for i in range(len(line)):
+			try:
+				line[i] = float(line[i])
+			except ValueError:
+				pass
+		return line
+
+	lines = kt.read_lines('test_file.txt', map_line)
+	lines_expected = [
+		['word1', 'word2'],
+		['word1', 'word3'],
+		['word', 1, 'word', 2],
+		['words', 'next']
+	]
+
+	assert(lines == lines_expected)
