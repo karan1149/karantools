@@ -199,3 +199,19 @@ def test_read_lines():
 	]
 
 	assert(lines == lines_expected)
+
+def test_suppress_stdout(capfd):
+
+	def print_hello_world():
+		print('hello world')
+
+	print_hello_world()
+
+	out, err = capfd.readouterr()
+	assert(out == "hello world\n")
+
+	with kt.suppress_stdout():
+		print_hello_world()
+
+	out, err = capfd.readouterr()
+	assert(not out)
