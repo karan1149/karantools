@@ -8,6 +8,7 @@ import pickle
 import requests
 import zipfile
 import io
+import multiprocessing
 
 def average(arr):
     return float(sum(arr)) / len(arr)
@@ -236,6 +237,25 @@ def read_lines(filename, map_fn):
     return mapped_lines
 
 ######################################################################
+#                           TIME/PROFILING                           #
+######################################################################
+
+
+
+######################################################################
+#                       CONCURRENCY DIRECTIVES                       #
+######################################################################
+
+class Pool(object):
+    def __init__(processes):
+        self.processes = processes
+        self.pool = multiprocessing.Pool(processes)
+
+    def map(map_func, iterator):
+        return pool.map(map_func, iterator)
+
+
+######################################################################
 #                              PRINTING                              #
 ######################################################################
 
@@ -250,12 +270,26 @@ def print_color_gradient(string, color='RED'):
     color_seq = colors.get_seq(colors.normalize(color), len(string))
     print(''.join([color_seq[i] + ch + colors.END for i, ch in enumerate(string)]))
 
-def print_comment_header_block(header_string, length=70):
+def print_color_rainbow(*args, **kwargs):
+    print_color_gradient(*args, **kwargs)
+
+def print_comment_header_block(header_string, length=70, adjust_length=True):
+    if adjust_length:
+        length = max(len(header_string) + 2, length)
     print('#' * length)
     left_spaces = (length - 2 - len(header_string)) // 2
     right_spaces = length - 2 - len(header_string) - left_spaces
     print('#' + ' ' * left_spaces + header_string + ' ' * right_spaces + '#')
     print('#' * length)
+
+def print_header_block(header_string, length=80, adjust_length=True):
+    if adjust_length:
+        length = max(len(header_string) + 2, length)
+    print('-' * length)
+    left_spaces = (length - len(header_string)) // 2
+    right_spaces = length - len(header_string) - left_spaces
+    print_bold(' ' * left_spaces + header_string + ' ' * right_spaces)
+    print('-' * length)
 
 @contextmanager
 def suppress_stdout():
