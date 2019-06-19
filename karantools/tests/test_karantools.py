@@ -200,6 +200,63 @@ def test_read_lines():
 
 	assert(lines == lines_expected)
 
+def test_print_bold(capfd):
+	kt.print_bold('hello world')
+	out, err = capfd.readouterr()
+	assert(out == kt.colors.BOLD + 'hello world' + kt.colors.END + '\n')
+	
+def test_print_comment_header_block(capfd):
+
+	length = 70
+	kt.print_comment_header_block('HELLO WORLD')
+
+	out, err = capfd.readouterr()
+	assert(out == "#" * 70 + '\n#' + ' ' * 28 + 'HELLO WORLD' + ' ' * 29 + '#\n' + "#" * 70 + '\n')
+
+	length = 80
+	kt.print_comment_header_block('HELLO WORLD', length=length)
+
+	out, err = capfd.readouterr()
+	assert(out == "#" * 80 + '\n#' + ' ' * 33 + 'HELLO WORLD' + ' ' * 34 + '#\n' + "#" * 80 + '\n')
+
+	length = 80
+	kt.print_comment_header_block('HELLOHELLO' * 10, length=length)
+
+	out, err = capfd.readouterr()
+	assert(out == "#" * 102 + '\n#' + ' ' * 0 + 'HELLOHELLO' * 10 + ' ' * 0 + '#\n' + "#" * 102 + '\n')
+
+	length = 80
+	kt.print_comment_header_block('HELLOHELLO' * 10, length=length, adjust_length=False)
+
+	out, err = capfd.readouterr()
+	assert(out == "#" * 80 + '\n#' + ' ' * 0 + 'HELLOHELLO' * 10 + ' ' * 0 + '#\n' + "#" * 80 + '\n')
+
+def test_print_header_block(capfd):
+
+	length = 80
+	kt.print_header_block('HELLO WORLD')
+
+	out, err = capfd.readouterr()
+	assert(out == "-" * 80 + '\n' + kt.colors.BOLD + ' ' * 34 + 'HELLO WORLD' + ' ' * 35 + kt.colors.END + '\n' + "-" * 80 + '\n')
+
+	length = 90
+	kt.print_header_block('HELLO WORLD', length=length)
+
+	out, err = capfd.readouterr()
+	assert(out == "-" * 90 + '\n' + kt.colors.BOLD + ' ' * 39 + 'HELLO WORLD' + ' ' * 40 + kt.colors.END + '\n' + "-" * 90 + '\n')
+
+	length = 90
+	kt.print_header_block('HELLOHELLO' * 10, length=length)
+
+	out, err = capfd.readouterr()
+	assert(out == "-" * 102 + '\n' + kt.colors.BOLD + ' ' + 'HELLOHELLO' * 10 + ' ' + kt.colors.END + '\n' + "-" * 102 + '\n')
+
+	length = 90
+	kt.print_header_block('HELLOHELLO' * 10, length=length, adjust_length=False)
+
+	out, err = capfd.readouterr()
+	assert(out == "-" * 90 + '\n' + kt.colors.BOLD + 'HELLOHELLO' * 10 + kt.colors.END + '\n' + "-" * 90 + '\n')
+
 def test_suppress_stdout(capfd):
 
 	def print_hello_world():
