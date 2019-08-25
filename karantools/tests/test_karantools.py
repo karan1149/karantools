@@ -200,11 +200,41 @@ def test_read_lines():
 
 	assert(lines == lines_expected)
 
+def test_time(capfd):
+	with pytest.raises(RuntimeError):
+		kt.time.end()
+
+	kt.time.start('My task')
+	kt.time.end()
+
+	out, err = capfd.readouterr()
+
+	assert('My task completed in' in out)
+
+	kt.time.start()
+	kt.time.end()
+
+	out, err = capfd.readouterr()
+
+	assert('Task completed in' in out)
+
+	kt.time.start()
+	kt.time.end(silent=True)
+
+	out, err = capfd.readouterr()
+
+	assert(not out)
+
+	kt.time.print_times()
+	out, err = capfd.readouterr()
+
+	assert(len(out.split('\n')) == 5)
+
 def test_print_bold(capfd):
 	kt.print_bold('hello world')
 	out, err = capfd.readouterr()
 	assert(out == kt.colors.BOLD + 'hello world' + kt.colors.END + '\n')
-	
+
 def test_print_comment_header_block(capfd):
 
 	length = 70

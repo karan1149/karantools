@@ -9,6 +9,8 @@ import requests
 import zipfile
 import io
 import multiprocessing
+from time import time as systime
+import functools
 
 def average(arr):
     return float(sum(arr)) / len(arr)
@@ -240,20 +242,41 @@ def read_lines(filename, map_fn):
 #                           TIME/PROFILING                           #
 ######################################################################
 
+class time(object):
+    start_time = None
+    description = None
+    previous_times = []
 
+    @classmethod
+    def start(cls, description=''):
+        cls.start_time = systime()
+        cls.description = description
 
-######################################################################
-#                       CONCURRENCY DIRECTIVES                       #
-######################################################################
+    @classmethod
+    def end(cls, silent=False):
+        if cls.start_time is None:
+            raise RuntimeError('Start needs to be called before end.')
 
-class Pool(object):
-    def __init__(processes):
-        self.processes = processes
-        self.pool = multiprocessing.Pool(processes)
+        previous_time = systime() - cls.start_time
+        des = cls.description
 
-    def map(map_func, iterator):
-        return pool.map(map_func, iterator)
+        cls.start_time = None
+        cls.description = None
 
+        cls.previous_times.append((des, previous_time))
+
+        if not silent:
+            if not des:
+                des = 'Task'
+            print_header_block('%s completed in %f seconds.' % (des, previous_time))
+
+    @classmethod
+    def print_times(cls):
+        print('')
+        for i, (des, previous_time) in enumerate(cls.previous_times):
+            if not des:
+                des = 'Task'
+            print('%s completed in %f seconds.' % (des, previous_time))
 
 ######################################################################
 #                              PRINTING                              #
@@ -300,3 +323,13 @@ def suppress_stdout():
             yield
         finally:
             sys.stdout = old_stdout
+
+######################################################################
+#                             EXECUTION                              #
+######################################################################
+
+def run_command(command_str):
+    print_bold('Running command:')
+    print_color(command_str, color='green')
+    print()
+    os.system(command_str)
