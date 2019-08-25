@@ -305,13 +305,13 @@ def print_comment_header_block(header_string, length=70, adjust_length=True):
     print('#' + ' ' * left_spaces + header_string + ' ' * right_spaces + '#')
     print('#' * length)
 
-def print_header_block(header_string, length=80, adjust_length=True):
+def print_header_block(header_string, length=80, adjust_length=True, color='BOLD'):
     if adjust_length:
         length = max(len(header_string) + 2, length)
     print('-' * length)
     left_spaces = (length - len(header_string)) // 2
     right_spaces = length - len(header_string) - left_spaces
-    print_bold(' ' * left_spaces + header_string + ' ' * right_spaces)
+    print_color(' ' * left_spaces + header_string + ' ' * right_spaces, color=color)
     print('-' * length)
 
 @contextmanager
@@ -329,7 +329,8 @@ def suppress_stdout():
 ######################################################################
 
 def run_command(command_str):
-    print_bold('Running command:')
+    print_color('-' * 80, color='green')
     print_color(command_str, color='green')
+    print_color('-' * 80, color='green')
     print()
     os.system(command_str)
