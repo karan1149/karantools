@@ -332,5 +332,4 @@ def run_command(command_str):
     print_color('-' * 80, color='green')
     print_color(command_str, color='green')
     print_color('-' * 80, color='green')
-    print()
     os.system(command_str)
