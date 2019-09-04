@@ -337,8 +337,19 @@ def suppress_stdout():
 #                             EXECUTION                              #
 ######################################################################
 
-def run_command(command_str):
+def run_command(command_str, ignore_error=False):
     print_color('-' * 80, color='green')
     print_color(command_str, color='green')
     print_color('-' * 80, color='green')
-    os.system(command_str)
+    exit_status = os.system(command_str)
+
+    if not exit_status == 0:
+        print_bold("Error while running command.")
+        if not ignore_error:
+            if prompt_yes_or_no('Continue running?'):
+                return exit_status
+            else:
+                exit(1)
+
+    return exit_status
+
