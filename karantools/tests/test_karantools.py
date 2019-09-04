@@ -1,5 +1,6 @@
 import karantools as kt
 import pytest
+import mock
 
 def test_average_simple():
 	assert(kt.average([1, 2, 3]) == 2)
@@ -121,12 +122,23 @@ def test_max_score_streamer():
 		assert(streamer.query() == 5)
 		assert(streamer.query_score() == -0.5)
 
-def test_assert_and_print():
+def test_assert_and_print(capfd):
 	kt.assert_and_print(1, 1 > 0)
+	out, err = capfd.readouterr()
+	assert(out == "1\n")
+
 	kt.assert_and_print(1, 1 >= 0)
+	out, err = capfd.readouterr()
+	assert(out == "1\n")
+
 	kt.assert_and_print(1, 1 >= 1)
+	out, err = capfd.readouterr()
+	assert(out == "1\n")
+
 	test_list = [1, 2, 3]
 	kt.assert_and_print(test_list, kt.average(test_list) == 2)
+	out, err = capfd.readouterr()
+	assert(out == "[1, 2, 3]\n")
 
 	with pytest.raises(AssertionError):
 		test_list = [1, 2, 3]
