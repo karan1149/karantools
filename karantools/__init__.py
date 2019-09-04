@@ -1,3 +1,4 @@
+from __future__ import print_function    
 from collections import defaultdict
 import random
 import numpy as np
@@ -239,13 +240,17 @@ def read_lines(filename, map_fn):
     return mapped_lines
 
 def prompt_yes_or_no(prompt):
-    reply = str(raw_input(prompt + ' (y/n): ')).lower().strip()
+    if sys.version_info[0] >= 3:
+        get_input = input
+    else:
+        get_input = raw_input
+    reply = str(get_input(prompt + ' (y/n): ')).lower().strip()
     if reply[0] == 'y':
         return True
     if reply[0] == 'n':
         return False
     else:
-        return yes_or_no("Please enter")
+        return prompt_yes_or_no("Please enter")
 
 ######################################################################
 #                           TIME/PROFILING                           #
