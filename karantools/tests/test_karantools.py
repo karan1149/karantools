@@ -314,3 +314,17 @@ def test_suppress_stdout(capfd):
 
 	out, err = capfd.readouterr()
 	assert(not out)
+
+def test_run_command(capfd):
+	assert(kt.run_command('true') == 0)
+	out, err = capfd.readouterr()
+	assert('true' in out)
+
+	assert(kt.run_command('echo "hi"') == 0)
+	out, err = capfd.readouterr()
+	assert('echo "hi"' in out)
+
+	assert(kt.run_command('false', ignore_error=True) != 0)
+	out, err = capfd.readouterr()
+	assert('false' in out)
+	assert('Error' in out)
