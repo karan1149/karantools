@@ -238,6 +238,15 @@ def read_lines(filename, map_fn):
             mapped_lines.append(map_fn(line))
     return mapped_lines
 
+def prompt_yes_or_no(prompt):
+    reply = str(raw_input(prompt + ' (y/n): ')).lower().strip()
+    if reply[0] == 'y':
+        return True
+    if reply[0] == 'n':
+        return False
+    else:
+        return yes_or_no("Please enter")
+
 ######################################################################
 #                           TIME/PROFILING                           #
 ######################################################################
