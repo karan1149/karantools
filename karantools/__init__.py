@@ -262,7 +262,7 @@ class time(object):
     previous_times = []
 
     @classmethod
-    def start(cls, description=''):
+    def start(cls, description='Task'):
         cls.start_time = systime()
         cls.description = description
 
@@ -277,20 +277,30 @@ class time(object):
         cls.start_time = None
         cls.description = None
 
-        cls.previous_times.append((des, previous_time))
-
         if not silent:
-            if not des:
-                des = 'Task'
             print_header_block('%s completed in %f seconds.' % (des, previous_time))
+
+        cls.previous_times.append((des, previous_time))
 
     @classmethod
     def print_times(cls):
+        if not cls.previous_times:
+            raise RuntimeError('Start and end need to be called.')
         print('')
         for i, (des, previous_time) in enumerate(cls.previous_times):
-            if not des:
-                des = 'Task'
             print('%s completed in %f seconds.' % (des, previous_time))
+
+class timer(object):
+    def __init__(self, description='Task'):
+        self.start_time = None
+        self.des = description
+
+    def __enter__(self):
+        self.start_time = systime()
+
+    def __exit__(self, type, value, traceback):
+        previous_time = systime() - self.start_time
+        print_header_block('%s completed in %f seconds.' % (self.des, previous_time))
 
 ######################################################################
 #                              PRINTING                              #
@@ -349,7 +359,7 @@ def run_command(command_str, ignore_error=False):
     exit_status = os.system(command_str)
 
     if not exit_status == 0:
-        print_bold("Error while running command.")
+        print_bold("\nError while running command.")
         if not ignore_error:
             if prompt_yes_or_no('Continue running?'):
                 return exit_status
